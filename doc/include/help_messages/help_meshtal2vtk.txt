@@ -1,0 +1,18 @@
+USAGE: meshtal2vtk [--version] <MESHTAL> [TALLY [TALLY ... ]] 
+
+DESCRIPTION:
+
+meshtal2vtk converts mesh tallies from an MCNP MESHTAL file into XML-formatted 
+StructuredGrid (.vts) VTK files. This utility only works for XYZ (Cartesian) 
+and RZT (cylindrical) geometries. 
+
+OPTIONS:
+
+--version, -v     : Print version and exit 
+
+MESHTAL           : MESHTAL file containing one or more mesh tallies 
+
+TALLY             : Tally number for which to produce the VTK files 
+
+AUTHOR: Joel A. Kulesza [jkulesza@lanl.gov] 
+

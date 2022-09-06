@@ -1,0 +1,9 @@
+target_sources(F5_CXX
+INTERFACE
+  "${prefix}/shacl/f5/H5Dataset/DatasetBuilder.hpp"
+  "${prefix}/shacl/f5/H5Dataset/DatasetOpen.hpp"
+  "${prefix}/shacl/f5/H5Dataset/DatasetRead.hpp"
+  "${prefix}/shacl/f5/H5Dataset/DatasetType.hpp"
+  "${prefix}/shacl/f5/H5Dataset/DatasetWrite.hpp"
+  "${prefix}/shacl/f5/H5Dataset/Properties.hpp"
+)

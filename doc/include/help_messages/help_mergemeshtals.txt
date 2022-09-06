@@ -1,0 +1,20 @@
+USAGE: mergemeshtals [--version] [--verbose] [--output output] 
+       <MESHTAL [MESHTAL ... ]> 
+
+DESCRIPTION:
+
+mergemeshtals statistically merges multiple MCNP MESHTAL files into a single 
+MESHTAL file. 
+
+OPTIONS:
+
+--version         : Print version and exit 
+
+--verbose, -v     : Increase output verbosity 
+
+--output, -o      : Output MESHTAL file name [Default: mergemeshtals.out] 
+
+MESHTAL           : MESHTAL file names to be merged 
+
+AUTHOR: Clell J. (CJ) Solomon [csolomon@lanl.gov] 
+

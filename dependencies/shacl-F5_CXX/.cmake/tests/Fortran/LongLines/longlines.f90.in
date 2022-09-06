@@ -1,0 +1,3 @@
+program main
+  write(*,'(a)') "$<TARGET_PROPERTY:longlines,COMPILE_OPTIONS>"
+end program

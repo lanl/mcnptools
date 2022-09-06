@@ -1,0 +1,10 @@
+macro(previous_add_executable)
+  if(NOT previous_add_executable_fn)
+    set(previous_add_executable_fn add_executable)
+  endif()
+
+  push(previous_add_executable_fn)
+  set(previous_add_executable_fn _${previous_add_executable_fn})
+  call(${previous_add_executable_fn} "${ARGN}")
+  pop(previous_add_executable_fn)
+endmacro()

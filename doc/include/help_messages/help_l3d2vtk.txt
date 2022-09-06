@@ -1,0 +1,19 @@
+USAGE: l3d2vtk [--version] [--verbose] <LNK3DNT> [OUTPUT] 
+
+DESCRIPTION:
+
+l3d2vtk converts a LNK3DNT file into an XML-formatted StructuredGrid (.vts) VTK 
+file. 
+
+OPTIONS:
+
+--version, -v     : Print version and exit 
+
+--verbose, -V     : Produce standard output giving status (Default: False) 
+
+LNK3DNT           : LNK3DNT file name to convert 
+
+OUTPUT            : Converted LNK3DNT output name (Default: lnk3dnt.vts) 
+
+AUTHOR: Joel A. Kulesza [jkulesza@lanl.gov] 
+

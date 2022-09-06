@@ -1,0 +1,8 @@
+Checks:          'clang-diagnostic-*,clang-analyzer-*,*,-llvm-header-guard,-cert-err60-cpp,-fuchsia-*,-hicpp-signed-bitwise,-*-magic-numbers'
+WarningsAsErrors: ''
+HeaderFilterRegex: 'f5/.*'
+AnalyzeTemporaryDtors: false
+FormatStyle:     LLVM
+CheckOptions:
+- key:             misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+  value:           '1'

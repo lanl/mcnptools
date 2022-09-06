@@ -1,0 +1,8 @@
+macro(pop variable_name)
+  if(DEFINED _${variable_name})
+    set(${variable_name} "${_${variable_name}}")
+    pop(_${variable_name})
+  else()
+    unset(${variable_name})
+  endif()
+endmacro()

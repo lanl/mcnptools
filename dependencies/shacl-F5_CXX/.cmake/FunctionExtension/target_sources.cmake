@@ -1,0 +1,10 @@
+macro(previous_target_sources)
+  if(NOT previous_target_sources_fn)
+    set(previous_target_sources_fn target_sources)
+  endif()
+
+  push(previous_target_sources_fn)
+  set(previous_target_sources_fn _${previous_target_sources_fn})
+  call(${previous_target_sources_fn} ${ARGN})
+  pop(previous_target_sources_fn)
+endmacro()

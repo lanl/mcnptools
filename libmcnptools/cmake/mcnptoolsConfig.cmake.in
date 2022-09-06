@@ -1,0 +1,29 @@
+include(CMakeFindDependencyMacro)
+
+if( @Boost_REGEX_FOUND@ )
+  list(APPEND boost_components "regex")
+endif()
+
+if( @Boost_SERIALIZATION_FOUND@ )
+  list(APPEND boost_components "serialization")
+endif()
+
+if( @Boost_MPI_FOUND@ )
+  list(APPEND boost_components "mpi")
+endif()
+
+if( boost_components )
+  find_dependency(Boost 1.60 COMPONENTS "${boost_components}")
+else()
+  find_dependency(mcnptools_boost)
+endif()
+
+if( @MPI_C_FOUND@ )
+  find_dependency(MPI)
+endif()
+
+if( NOT DEFINED shacl::F5_CXX )
+  find_dependency(shacl-F5_CXX HINTS "${CMAKE_CURRENT_LIST_DIR}/../")
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/mcnptoolsTargets.cmake")

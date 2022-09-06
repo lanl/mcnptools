@@ -1,0 +1,102 @@
+Input file to generate Mctal, Meshtal, and Ptrac files for MCNPTools testing
+c =============================== cell block ===============================
+1001  1  -18.0  -101                                                 imp:n=1
+1002  2   -1.0   101 -102                                            imp:n=1
+1003  0          102                                                 imp:n=0
+
+c =============================== surf block ===============================
+101  so   5.0
+102  so  10.0
+
+c =============================== data block ===============================
+c --- materials ---
+m1   92235.70c  1.0
+m2    1001.70c  2.0
+      8016.70c  1.0
+c
+c --- source ---
+sdef  pos=0 0 0
+      erg=2.0
+c
+kcode 5000  1  5  49
+c
+c --- tallies for mctal file ---
+f1:n  101 102
+e1   1e-9  1e-3 1e3
+t1   0  10  20
+c1   0  1
+c
+f4:n  1001 1002
+e4   1e-9 1e-3 1e3
+t4   0  10  20
+c
+c --- meshtals for meshtal file ---
+c cartesian fmesh
+fmesh014:n  geom=xyz
+            origin=-10 -10 -10
+            imesh=10  iints=5
+            jmesh=10  jints=5
+            kmesh=10  kints=5
+fmesh024:n  geom=xyz
+            origin=-10 -10 -10
+            imesh=10  iints=5
+            jmesh=10  jints=5
+            kmesh=10  kints=5
+            emesh= 1e-9 1e-3 1e3
+fmesh034:n  geom=xyz
+            origin=-10 -10 -10
+            imesh=10  iints=5
+            jmesh=10  jints=5
+            kmesh=10  kints=5
+            tmesh= 0  10  20
+fmesh044:n  geom=xyz
+            origin=-10 -10 -10
+            imesh=10  iints=5
+            jmesh=10  jints=5
+            kmesh=10  kints=5
+            emesh= 1e-9 1e-3 1e3
+            tmesh= 0  10  20
+            out=cf
+c cylindrical fmesh
+fmesh054:n  geom=rzt
+            origin=0 -10 0
+            vec=0 1 0
+            axs=0 0 1
+            imesh=10  iints=4
+            jmesh=10  jints=5
+            kmesh=1   kints=4
+fmesh064:n  geom=rzt
+            origin=0 -10 0
+            vec=0 1 0
+            axs=0 0 1
+            imesh=10  iints=4
+            jmesh=10  jints=5
+            kmesh=1   kints=4
+            emesh= 1e-9 1e-3 1e3
+fmesh074:n  geom=rzt
+            origin=0 -10 0
+            vec=0 1 0
+            axs=0 0 1
+            imesh=10  iints=4
+            jmesh=10  jints=5
+            kmesh=1   kints=4
+            tmesh= 0  10  20
+fmesh084:n  geom=rzt
+            origin=0 -10 0
+            vec=0 1 0
+            axs=0 0 1
+            imesh=10  iints=4
+            jmesh=10  jints=5
+            kmesh=1   kints=4
+            emesh= 1e-9 1e-3 1e3
+            tmesh= 0  10  20
+            out=cf
+c
+c --- ptrac file ---
+ptrac  write=all
+       meph=50
+       max=10000
+       file=asc
+c
+prdmp 2j -1
+print

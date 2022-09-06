@@ -1,0 +1,6 @@
+AllowShortFunctionsOnASingleLine: Empty
+AlwaysBreakTemplateDeclarations: Yes
+BasedOnStyle: LLVM
+ColumnLimit: 100
+IndentWidth: 4
+Language: Cpp

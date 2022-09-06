@@ -1,0 +1,17 @@
+USAGE: l3dinfo [--version] [--full] <LNK3DNT [LNK3DNT ... ]> 
+
+DESCRIPTION:
+
+l3dinfo produces information about LNK3DNT files to stdout 
+
+OPTIONS:
+
+--version, -v     : Print version and exit 
+
+--full, -f        : Produce a full listing of the LNK3DNT contents (can 
+                    greatly increase runtime) 
+
+LNK3DNT           : LNK3DNT files about which to produce information 
+
+AUTHOR: Clell J. (CJ) Solomon [csolomon@lanl.gov] 
+

@@ -1,0 +1,20 @@
+USAGE: mergemctals [--version] [--verbose] [--output output] 
+       <MCTAL [MCTAL ... ]> 
+
+DESCRIPTION:
+
+mergemctals statistically merges multiple MCNP MCTAL files into a single MCTAL 
+file. 
+
+OPTIONS:
+
+--version         : Print version and exit 
+
+--verbose, -v     : Increase output verbosity 
+
+--output, -o      : Output MCTAL file name [Default: mergemctals.out] 
+
+MCTAL             : MCTAL file names to be merged 
+
+AUTHOR: Clell J. (CJ) Solomon [csolomon@lanl.gov] 
+

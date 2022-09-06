@@ -1,0 +1,63 @@
+import os
+import re
+import sys
+import platform
+import subprocess
+
+from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
+
+
+class CMakeExtension(Extension):
+    def __init__(self, name, sourcedir=''):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
+
+
+class CMakeBuild(build_ext):
+    def run(self):
+        try:
+            out = subprocess.check_output(['@CMAKE_COMMAND@', '--version'])
+        except OSError:
+            raise RuntimeError("CMake must be installed to build the following extensions: " +
+                               ", ".join(e.name for e in self.extensions))
+
+        for ext in self.extensions:
+            self.build_extension(ext)
+
+    def build_extension(self, ext):
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+
+        build_args = ['--config', '$<CONFIG>', '--target', '$<TARGET_PROPERTY:_mcnptools_wrap,NAME>']
+
+        subprocess.check_call(['@CMAKE_COMMAND@', '--build', '@mcnptools_BINARY_DIR@'] + build_args)
+
+def internalize_libs():
+    '''This function internalizes the HDF5 dynamic library to permit
+    packaging/installation for Python 3.8 and later, which changes the library
+    search procedure as documented at:
+    https://docs.python.org/3/whatsnew/3.8.html#bpo-36085-whatsnew'''
+
+    if os.name == 'nt':
+        import shutil
+        dlls = "$<IF:$<BOOL:WIN32>,$<TARGET_RUNTIME_DLLS:_mcnptools_wrap>,>".split(";")
+        for dll in dlls:
+            if "hdf5" in dll.lower():
+                assert(os.path.isfile(dll))
+                shutil.copy(dll, os.path.join("mcnptools"))
+
+internalize_libs()
+
+setup(
+    name='mcnptools',
+    version='@PROJECT_VERSION@',
+    description = 'tools for manipulating mcnp output',
+    author = ['Clell J. (CJ) Solomon', 'Cameron Bates', 'Joel Kulesza'],
+    author_email = ['csolomon@lanl.gov', 'batesca@lanl.gov, jkulesza@lanl.gov'],
+    packages=['mcnptools'],
+    package_data={'mcnptools' : ['$<TARGET_FILE_NAME:_mcnptools_wrap>', "*.dll"]},
+    test_suite='mcnptools_tests',
+    ext_modules=[CMakeExtension('mcnptools._mcnptools_wrap')],
+    cmdclass=dict(build_ext=CMakeBuild),
+    zip_safe=False,
+)

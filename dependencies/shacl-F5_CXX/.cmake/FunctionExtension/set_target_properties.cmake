@@ -1,0 +1,10 @@
+macro(previous_set_target_properties)
+  if(NOT previous_set_target_properties_fn)
+    set(previous_set_target_properties_fn set_target_properties)
+  endif()
+
+  push(previous_set_target_properties_fn)
+  set(previous_set_target_properties_fn _${previous_set_target_properties_fn})
+  call(${previous_set_target_properties_fn} ${ARGN})
+  pop(previous_set_target_properties_fn)
+endmacro()

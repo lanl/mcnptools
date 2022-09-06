@@ -1,0 +1,4 @@
+program use_standard_semantics
+  use, intrinsic :: iso_fortran_env
+  write(output_unit,'(a)',advance='no') "$<TARGET_PROPERTY:use_no_backslash_escape,COMPILE_OPTIONS>"
+end program

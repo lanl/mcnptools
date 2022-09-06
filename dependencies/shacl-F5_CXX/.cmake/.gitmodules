@@ -1,0 +1,8 @@
+
+[submodule "tests/Git/Submodule/Packages/Catch2"]
+	path = tests/Git/Submodule/Packages/Catch2
+	url = ../../catchorg/Catch2.git
+	branch = master
+[submodule "tests/Git/Submodule/Packages/json"]
+	path = tests/Git/Submodule/Packages/json
+	url = ../../nlohmann/json.git

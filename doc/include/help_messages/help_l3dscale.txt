@@ -1,0 +1,18 @@
+USAGE: l3dscale [--version] <LNK3DNT> <FACTOR> [OUTPUT] 
+
+DESCRIPTION:
+
+l3dscale scales the dimensions of a LNK3DNT file 
+
+OPTIONS:
+
+--version, -v     : Print version and exit 
+
+LNK3DNT           : LNK3DNT file to be scaled 
+
+FACTOR            : Scaling factor to be applied to the file 
+
+OUTPUT            : Output LNK3DNT file name [Default: LNK3DNT.scaled] 
+
+AUTHOR: Clell J. (CJ) Solomon [csolomon@lanl.gov] 
+

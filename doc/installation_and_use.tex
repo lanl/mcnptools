@@ -1,0 +1,1313 @@
+\documentclass[11pt]{article}
+\usepackage[scaled=0.83]{beramono}
+\usepackage{booktabs}
+\usepackage{embedfile}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage[unicode=true,pdfusetitle]{hyperref}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{xcolor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% General package and document-behavior customization.
+
+\hypersetup{ % Order matters...
+  allcolors=blue,
+  unicode=true,
+  bookmarks=true,
+  bookmarksnumbered=true,
+  bookmarksopen=false,
+  breaklinks=true,
+  pdfborder={0 0 0},
+  pdfborderstyle={},
+  colorlinks=true
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{11pt plus 3pt minus 3pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code-listing customization.
+
+\definecolor{codebackground}{HTML}{ffffff}
+\definecolor{codeframe}     {HTML}{000000}
+\definecolor{codecomment}   {HTML}{1b9e77} % http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+\definecolor{codestring}    {HTML}{7570b3} % http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+\definecolor{codekeyword}   {HTML}{d95f02} % http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+\definecolor{bgh}{HTML}{f2f2f2}
+
+\lstset {%
+  aboveskip=+0.8em,                                  % amount of space added above the listing
+  belowskip=-0.5em,                                  % amount of space added below the listing
+  backgroundcolor=\color{codebackground},            % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\normalsize\ttfamily,                   % the size of the fonts that are used for the code
+  columns=flexible,                                  % improve column layout for non-fixed-width fonts
+  commentstyle=\color{codecomment},                  % comment style
+  numberstyle=\color{gray}\tiny\zebra{white}{bgh}{}, % the style that is used for the line-numbers
+  rulecolor=\color{codeframe},                       % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  stringstyle=\color{codestring},                    % string literal style
+  breakatwhitespace=false,                           % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                                   % sets automatic line breaking
+  captionpos=t,                                      % sets the caption-position to bottom
+  deletekeywords={...},                              % if you want to delete keywords from the given language
+  escapeinside={<@}{@>},                             % if you want to add LaTeX within your code
+  extendedchars=true,                                % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,                                      % adds a frame around the code
+  keepspaces=true,                                   % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{codekeyword},                  % keyword style
+  numbers=left,                                      % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                                     % how far the line-numbers are from the code
+  showspaces=false,                                  % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,                            % underline spaces within strings only
+  showtabs=false,                                    % show tabs within strings adding particular underscores
+  stepnumber=1,                                      % the step between two line-numbers. If it's 1, each line will be numbered
+  tabsize=2,                                         % sets default tabsize to 2 spaces
+}
+
+% Configure zebra striping.
+\newcommand\realnumberstyle[1]{}
+\makeatletter
+\newcommand{\zebra}[2]{%
+    \begingroup
+    \lst@basicstyle
+    \ifodd\value{lstnumber}%
+        \color{#1}%
+    \else
+        \color{#2}%
+    \fi
+    \ifnum\value{lstnumber}>9
+        \rlap{\hspace*{\lst@numbersep}\hspace*{0.95em}%
+        \color@block{\linewidth}{\ht\strutbox}{\dp\strutbox}%
+        }%
+    \else
+        \rlap{\hspace*{\lst@numbersep}\hspace*{0.5em}%
+        \color@block{\linewidth}{\ht\strutbox}{\dp\strutbox}%
+        }%
+    \fi
+    \endgroup
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Frontmatter
+
+\title{The MCNPTools Package: Installation and Use}
+\author{Cameron R. Bates, Simon R. Bolding, Colin J. Josey, Joel A. Kulesza, \\Clell J. (CJ) Solomon Jr., Anthony J. Zukaitis}
+\date{August 2022}
+
+\makeatletter
+\def\blfootnote{\gdef\@thefnmark{}\@footnotetext}
+\makeatother
+\newcommand{\makereg}{\raisebox{1ex}{\scalebox{0.5}{®}}}
+\newcommand{\trademarktext}{MCNP\makereg\ and Monte Carlo N-Particle\makereg\
+are registered trademarks owned by Triad National Security, LLC, manager and
+operator of Los Alamos National Laboratory. Any third party use of such
+registered marks should be properly attributed to Triad National Security, LLC,
+including the use of the \makereg\ designation as appropriate. Any questions
+regarding licensing, proper use, and/or proper attribution of Triad National
+Security, LLC  marks should be directed to trademarks@lanl.gov.}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}\label{sec:introduction}
+
+MCNPTools\blfootnote{\trademarktext} is a C++ software library bound to Python (2
+\& 3) via the Simplified Wrapper and Interface Generator (SWIG version 3.0.7).
+The minimum requirements to build MCNPTools as a C++ library are the following:
+
+\begin{itemize}
+  \item a C++ compiler supporting C++11 features
+  \item the CMake tool set version 3.21 or above
+  \item HDF5 version 1.10.2 or above
+\end{itemize}
+
+Currently, the following compiler options are tested and supported:
+
+\begin{itemize}
+  \item GCC 8.3.0 and above on Linux and macOS
+  \item MSVC 19.0 on Windows
+  \item Apple Clang 7.3.0 and above on macOS
+  \item Intel C++ Classic Compiler 18.0.5 and above
+\end{itemize}
+
+For the Python bindings, the following must be installed:
+
+\begin{itemize}
+  \item Python 2.7 or newer
+  \item Setuptools
+  \item Pip
+\end{itemize}
+
+Builds of the Python bindings have been extensively tested with the Anaconda Python distribution
+(\hyperlink{https://www.anaconda.com/products/individual}{https://www.anaconda.com/products/individual}),
+but have been cursorily tested with other distributions as well.
+
+\subsection{Installing MCNPTools from a Wheel}\label{sec::installing-mcnptools-from-a-wheel}
+
+If you would like to install MCNPTools without building it yourself, you can do so by downloading a wheel for your operating system.
+Then, run:
+\begin{lstlisting}
+  python -m pip install mcnptools-X.Y.Z-??????.whl
+\end{lstlisting}
+The \texttt{??????} is a placeholder for information about the system for which the specified wheel file is built, and can include your OS and Python version.
+One can add the \texttt{--user} command to install in your user Python modules if you do not wish to install system-wide, or \texttt{--prefix [path]} to select an installation directory.
+
+Note that MCNPTools will need to be re-installed whenever you upgrade your Python major version, e.g., from 3.9.X to 3.10.X.
+
+\subsection{Building MCNPTools}\label{sec:building-mcnptools}
+
+Once your build environment is set up (see Section~\ref{sec:setting-up-hdf5} for tips for getting HDF5 working), create a directory to build MCNPTools.
+Within the directory, run the following commands:
+
+\begin{lstlisting}
+  cmake -D CMAKE_INSTALL_PREFIX=[path to install] -D mcnptools.python_install=User [path to MCNPTools source directory]
+  cmake --build . --config Release
+  ctest --build-config Release
+  cmake --install . --config Release
+\end{lstlisting}
+
+This will configure, build, test, and install the MCNPTools library, utilities, and Python bindings.
+Testing is optional but recommended.
+One should confirm all tests pass prior to installation.
+
+The two CMake variables \texttt{CMAKE\_INSTALL\_PREFIX} and \texttt{mcnptools.python\_install} control where components of MCNPTools are installed.
+The location for the library and the utilities is controlled by the variable \texttt{CMAKE\_INSTALL\_PREFIX}.
+The Python bindings will be placed at \texttt{CMAKE\_INSTALL\_PREFIX/lib} and the utilities will be placed at \texttt{CMAKE\_INSTALL\_PREFIX/bin}.
+
+The Python binding install location is controlled by \texttt{mcnptools.python\_install}, which has three options:
+\begin{description}
+  \item[\texttt{Global}] This will install in the current global Python module directory, and is most useful for system-wide installs or for Python virtual environments. (Default)
+  \item[\texttt{User}] This will will install in the current user's Python module directory.
+  This is most useful for installing without administration privileges.
+  \item[\texttt{Prefix}] This will install within \texttt{CMAKE\_INSTALL\_PREFIX/lib}, which is most useful for packaging and maintaining multiple versions.
+  The precise location is OS-dependent, but on Linux, the location will likely be \texttt{CMAKE\_INSTALL\_PREFIX/lib/pythonX.X/site-packages}, where \texttt{X.X} corresponds to the specific Python version used to build MCNPTools.
+  In this case, you will have to add the \texttt{site-packages} path to the \texttt{PYTHONPATH} environment variable for Python to find the bindings.
+\end{description}
+
+Note that MCNPTools will need to be rebuilt and re-installed whenever you upgrade your Python version, e.g., from 3.9.X to 3.10.X.
+
+\subsubsection{Setting Up HDF5}\label{sec:setting-up-hdf5}
+
+Sometimes it is difficult for CMake to find a working HDF5 installation, and if it does, it may not load all the necessary libraries.
+
+CMake can find HDF5 in 3 different ways, in order of most reliable to least reliable:
+\begin{enumerate}
+  \item By setting the \texttt{HDF5\_DIR} environment variable to HDF5's own CMake folder, located at \texttt{<path to HDF5 install>/share/cmake/hdf5}. This folder may not be present if HDF5 was not built using CMake.
+  \item Through finding the program \texttt{h5cc} in the current environment's path.
+  \item By setting the \texttt{HDF5\_ROOT} environment variable to \texttt{<path to HDF5 install>}.
+\end{enumerate}
+
+\section{MCNPTools Utilities}\label{mcnptools-utilities}
+
+MCNPTools releases include binary utilities that facilitate common tasks or
+querying MCNP output files. This section provides information regarding the use
+of these utilities. The usage information presented can be obtained from all
+utilities by running the utility with the \texttt{-h} or \texttt{-\/-help}
+options specified.
+
+\subsection{\texttt{lnk3dnt} Utilities}
+
+\subsubsection{\texttt{l3d2vtk}}\label{sec:l3d2vtk}
+
+The \texttt{l3d2vtk} utility converts LNK3DNT files to XML-based
+StructuredGrid VTK (.vts) files. This can be particularly useful to MCNP
+users because a LNK3DNT file can be produced as MCNP output that
+represents a discretized representation of the MCNP CSG, which can then
+visualized interactively in a 3-D application.
+
+By default, \texttt{l3d2vtk} produces no standard output and writes a
+\texttt{lnk3dnt.vts} file. If the \texttt{-\/-verbose} option is given,
+then status is output periodically as the conversion proceeds.
+
+This utility functions for $\left(x\right)$ (Cartesian), $\left(r\right)$
+(cylindrical), $\left(r\right)$ (spherical), $\left(x,y\right)$,
+$\left(r,z\right)$, $\left(r,\theta\right)$, $\left(x,y,z\right)$,
+$\left(r,z,\theta\right)$ geometries. For large LNK3DNT files, this utility can
+become sensitive to the computer's stack size. However, large ($\sim100$ million
+zone) 3-D Cartesian files have been successfully converted and visualized
+interactively.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:l3d2vtk-help-message-output}.
+
+\subsubsection{\texttt{l3dcoarsen}}\label{sec:l3dcoarsen}
+
+The \texttt{l3dcoarsen} utility coarsens a LNK3DNT file and produces a new
+LNK3DNT file. By default, the resulting LNK3DNT file with have preserved
+material boundaries and the same number of mixed-material zones as the original;
+however, the user may keep more or less mixed-materials in a zone if desired.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:l3dcoarsen-help-message-output}.
+
+\subsubsection{\texttt{l3dinfo}}\label{sec:l3dinfo}
+
+The \texttt{l3dinfo} utility reports information about LNK3DNT files. By
+default, \texttt{l3dinfo} reports only basic information about the LNK3DNT file:
+geometry, extents, etc. If the \texttt{-\/-full} option is given, then the
+material information will be read and reported in addition to the basic
+information.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:l3dinfo-help-message-output}.
+
+\subsubsection{\texttt{l3dscale}}\label{sec:l3dscale}
+
+The \texttt{l3dscale} utility linearly scales the dimensions of a
+LNK3DNT file by a user-specified factor and produces a new LNK3DNT file.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:l3dscale-help-message-output}.
+
+\subsection{\texttt{mctal} Utilities}
+
+\subsubsection{\texttt{mctal2rad}}\label{sec:mctal2rad}
+
+The \texttt{mctal2rad} utility converts MCNP image tally results (e.g.,
+\texttt{FIR}, \texttt{FIP}, etc.) in a MCTAL file into TIFF images.
+Accordingly, \texttt{mctal2rad} depends on libtiff being installed and available
+during compilation. The output images can be created from only the direct
+detector contributions and the results can be transposed and/or scaled
+logarithmically.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:mctal2rad-help-message-output}.
+
+\subsubsection{\texttt{mergemctals}}\label{sec:mergemctals}
+
+The \texttt{mergemctals} utility statistically merges the results in
+multiple MCNP MCTAL files and produces a single resulting MCTAL file.
+
+\texttt{mergemctals} can also be compiled using Boost MPI so that MCTAL
+files can be merged in parallel. All machines (e.g., back-end nodes of a
+cluster) performing parallel operations must have access to the files to
+be merged.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:mergemctals-help-message-output}.
+
+\subsection{\texttt{meshtal} Utilities}
+
+\subsubsection{\texttt{mergemeshtals}}\label{sec:mergemeshtals}
+
+The \texttt{mergemeshtals} utility statistically merges the results in multiple
+MCNP Type-B MESHTAL files (i.e., those created with an \texttt{fmesh} card) and
+produces a single resulting MESHTAL file. \texttt{mergemeshtals} \emph{only}
+operates on column-formatted MESHTAL files.
+
+\texttt{mergemeshtals} can also be compiled using Boost MPI so that the MESHTAL
+files can be merged in parallel, though all machines (e.g., back-end nodes of a
+cluster) performing parallel operations must have access to the files to be
+merged.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:mergemeshtals-help-message-output}.
+
+\subsubsection{\texttt{meshtal2vtk}}\label{sec:meshtal2vtk}
+
+The \texttt{meshtal2vtk} utility converts MCNP XYZ (Cartesian) and/or RZT
+(cylindrical) MCNP mesh tally results in a MESHTAL file into XML-formatted
+StructuredGrid VTK (.vts) files. These files can then be viewed in scientific
+visualization applications such as ParaView or VisIt.
+
+Data series are logically named according to any binning that exists, or if no
+binning, as Tally\_Value and Tally\_Error. The user has the option of selecting
+only certain tallies with the TALLY parameter shown below. If left unspecified,
+all tallies are processed. Each tally is given its own .vts file.
+
+The execution options given via the help message is given in
+Listing~\ref{lst:meshtal2vtk-help-message-output}.
+
+\section{Description of the MCNPTools
+Library}\label{description-of-the-mcnptools-library}
+
+The true power of MCNPTools is in the ability for users to write their own
+custom tools and process MCNP outputs without the need to parse MCNP output
+formats. Currently, three MCNP output files can be read by MCNPTools and
+accessed in an object-oriented manner:
+
+\begin{description}
+  \item[MCTAL files] accessed via the \texttt{Mctal} class which in turn
+    provides access to the \texttt{MctalTally} and \texttt{MctalKcode} classes.
+  \item[MESHTAL files] accessed via the \texttt{Meshtal} class which in turn
+    provides access to the \texttt{MeshtalTally} class
+  \item[PTRAC files] accessed via the \texttt{Ptrac} class which in turn
+    provides access to the \texttt{PtracHistory} class which provides access to
+    the \texttt{PtracEvent} class
+\end{description}
+
+Each of these three outputs will be discussed in more detail in the
+following subsections.
+
+\subsection{Accessing MCTAL Data with
+MCNPTools}\label{accessing-mctal-data-with-mcnptools}
+
+MCNP MCTAL file data is accessed via three of MCNPTools' classes:
+
+\begin{description}
+  \item[\texttt{Mctal} class] Provides object-oriented access to a MCTAL file.
+  \item[\texttt{MctalTally} class] Provides object-oriented access to a tally in
+    a MCTAL file
+  \item[\texttt{MctalKcode} class] Provides object-oriented access to kcode
+    outputs in a MCTAL file
+\end{description}
+
+Each class will be discussed in the following sections.
+
+\subsubsection{\texttt{Mctal} Class}\label{the-mctal-class}
+
+To construct (create) an instance of the \texttt{Mctal} class, one simply passes
+the name of a MCTAL file to the \texttt{Mctal} constructor, e.g.,
+
+\begin{lstlisting}[language=Python]
+Mctal("mymctal")
+\end{lstlisting}
+
+The public methods available in the \texttt{Mctal} class are given in
+Table~\ref{tab:mctal_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{Mctal} Class Public Methods}
+  \label{tab:mctal_class_public_methods}
+    \begin{tabular}{lp{4in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{GetCode()}      & Returns a string of the generating code name \\
+        \texttt{GetVersion()}   & Returns a string of the code version \\
+        \texttt{GetProbid()}    & Returns a string of the problem identification \\
+        \texttt{GetDump()}      & Returns an integer of the corresponding restart dump number \\
+        \texttt{GetNps()}       & Returns an integer of the number of histories used in the normalization \\
+        \texttt{GetRandoms()}   & Returns an integer the number of random numbers used \\
+        \texttt{GetTallyList()} & Returns a list/vector of tally numbers available in in the the MCTAL file \\
+        \texttt{GetTally(NUM)}  & Returns a \texttt{MctalTally} class instance of tally number NUM \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+The most commonly used methods to access data in the MCTAL file are
+\texttt{GetTallyList} and \texttt{GetTally} for tally data and \texttt{GetKcode}
+for $k$-eigenvalue data. With \texttt{GetTallyList} and \texttt{GetTally}, loops
+over the tallies in the MCTAL file can be created to perform analyses. A
+Python example of such a loop structure is given in
+Listing~\ref{lst:mctal_class_use_example}.
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{Mctal} Class Use Example},
+  label={lst:mctal_class_use_example},
+  float
+]
+# open the mctal file "mymctal"
+mctal = mcnptools.Mctal("mymctal")
+
+# loop over tallies
+for tallynum in mctal.GetTallyList():
+    tally = mctal.GetTally(tallynum)
+
+    # now do something with the tally
+\end{lstlisting}
+
+\subsubsection{\texttt{MctalTally} Class}\label{the-mctaltally-class}
+
+The \texttt{MctalTally} class should only be created through calls to the
+\texttt{GetTally} method of the \texttt{Mctal} class. The \texttt{MctalTally}
+class will provide information about the tally and the values of data contained
+within the tally.
+
+\textbf{A Note on MCNP Tallies}: MCNP tallies are essentially a nine-dimensional
+array with each index of the array describing a bin structure of the tally.
+These bin structures are given in Table~\ref{tab:mcnp_tally_array_indices}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{MCNP Tally Array Indices}
+  \label{tab:mcnp_tally_array_indices}
+    \begin{tabular}{llp{4in}}
+      \toprule
+        Name & Identifier & Description \\
+      \midrule
+        facet          &  \texttt{f}    & The facet of the tally, cell, surface, point number \\
+        direct/flagged &  \texttt{d}    & The flagged/unflagged contribution for cell/surface tallies \emph{or} the direct/scattered contribution for point detectors (this dimension never exceeds 2) \\
+        user           &  \texttt{u}    & The user bins established by use of an \texttt{FT} tally input or by use of a \texttt{TALLYX} routine \\
+        segment        &  \texttt{s}    & The segmenting bins established by use of an \texttt{FS} tally input \\
+        multiplier     &  \texttt{m}    & The multiplier bins established by use of an \texttt{FM} tally input \\
+        cosine         &  \texttt{c}    & The cosine bins established by use of an \texttt{C} tally input \\
+        energy         &  \texttt{e}    & The energy bins established by use of an \texttt{E} tally input \\
+        time           &  \texttt{t}    & The time bins established by use of a \texttt{T} tally input \\
+        perturbation   &  \texttt{pert} & The perturbation number established by use of \texttt{PERT} inputs \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+With these bin structures, the values and errors in a tally are uniquely
+identified by the indices \texttt{(f,d,u,s,m,c,e,t,pert)}.
+
+The \texttt{MctalTally} class has the public class methods given in
+Table~\ref{tab:mctaltally_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{MctalTally} Class Public Methods}
+  \label{tab:mctaltally_class_public_methods}
+    \begin{tabular}{lp{3.5in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{ID()}                           & Return the integer tally number \\
+        \texttt{GetFBins()}                     & Return a list/vector of the ``facet'' bins of the tally \\
+        \texttt{GetDBins()}                     & Return a list/vector of the ``direct/flagged'' bins of the tally \\
+        \texttt{GetUBins()}                     & Return a list/vector of the ``user'' bins of the tally \\
+        \texttt{GetSBins()}                     & Return a list/vector of the ``segment'' bins of the tally \\
+        \texttt{GetMBins()}                     & Return a list/vector of the ``multiplier'' bins of the tally \\
+        \texttt{GetCBins()}                     & Return a list/vector of the ``cosine'' bins of the tally \\
+        \texttt{GetEBins()}                     & Return a list/vector of the ``energy'' bins of the tally \\
+        \texttt{GetTBins()}                     & Return a list/vector of the ``time'' bins of the tally \\
+        \texttt{GetValue(f,d,u,s,m,c,e,t,pert)} & Return the tally value identified by the indices \texttt{(f,d,u,s,m,c,e,t,pert)} \\
+        \texttt{GetValues(T,v1,v2,v3,v4,v5,v6,v7)} & Return the vector of values of specified bin \texttt{T} specifying other dimensions in order\\
+        \texttt{GetError(f,d,u,s,m,c,e,t,pert)} & Return the tally \emph{relative} error identified by the indices \texttt{(f,d,u,s,m,c,e,t,pert)} \\
+        \texttt{GetErrors(T,v1,v2,v3,v4,v5,v6,v7)} & Return the vector of errors of specified bin \texttt{T} specifying other dimensions in order\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+Often it is desirable to interrogate a tally value at the \emph{Tally
+Fluctuation Chart} (TFC) bin---the bin on which statistical analyses are
+performed. MCNPTools provides a defined constant \texttt{TFC} member of the
+\texttt{MctalTally} class that can be used in place of a bin index for any of
+the \texttt{(f,d,u,s,m,c,e,t)} bins. The Python code in
+Listing~\ref{lst:mctaltally_class_use_example} illustrates how one would fill a
+list with tally values by iterating over the energy bins of a tally (for brevity
+it is assumed the MCTAL file has been opened as object \texttt{mctal}).
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{MctalTally} Class Use Example},
+  label={lst:mctaltally_class_use_example},
+  float
+]
+# get the tally of interest (say tally 834)
+tally = mctal.GetTally(834)
+
+# create an alias for the TFC bin
+TFC = tally.TFC
+
+# get the energy bins
+ebins = tally.GetEBins()
+
+#create lists for tally values and errors
+values = list()
+errors = list()
+
+# iterate over the energy bins
+for i in range( len(ebins) ):
+    #                               f    d    u    s    m    c  e    t
+    values.append( tally.GetValue(TFC, TFC, TFC, TFC, TFC, TFC, i, TFC) )
+    errors.append( tally.GetError(TFC, TFC, TFC, TFC, TFC, TFC, i, TFC) )
+
+# for large arrays the same operation can be performed faster with GetValues
+values = tally.GetValues(tally.MctalTallyBins.E, TFC, TFC, TFC, TFC, TFC, TFC, TFC)
+errors = tally.GetErrors(tally.MctalTallyBins.E, TFC, TFC, TFC, TFC, TFC, TFC, TFC)
+
+\end{lstlisting}
+
+Note that the \texttt{pert} index has been omitted from the example above. The
+\texttt{GetValue} and \texttt{GetError} methods will default to the unperturbed
+tally quantities if \texttt{pert} is omitted.
+
+\subsubsection{\texttt{MctalKcode} Class}\label{the-mctalkcode-class}
+
+The \texttt{MctalKcode} class should be obtained only through calls to
+\texttt{GetKcode()} method of the \texttt{Mctal} class. The \texttt{MctalKcode}
+class will provide information about the $k_{\mathrm{eff}}$ calculation as a
+function of cycle. The \texttt{MctalKcode} class has the public methods given in
+Table~\ref{tab:mctalkcode_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{MctalKcode} Class Public Methods}
+  \label{tab:mctalkcode_class_public_methods}
+    \begin{tabular}{lp{3.5in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{GetCycles()}               & return the integer number of total kcode cycles \\
+        \texttt{GetSettle()}               & return the integer number of inactive kcode cycles \\
+        \texttt{GetNdat()}                 & return the integer number of data elements in a kcode entry \\
+        \texttt{GetValue(QUANTITY, CYCLE)} & return the value of \texttt{QUANTITY} at the specified \texttt{CYCLE} (default last) \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+The \texttt{QUANTITY} value that is passed into the \texttt{GetValue} method is
+a parameterized member constant of the \texttt{MctalKcode} class.
+\texttt{QUANTITY} must be one of the following defined parameters within the
+\texttt{MctalKcode} class namespace as given in Table~\ref{tab:mctalkcode_quantity_values}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{MctalKcode} Quantity Values}
+  \label{tab:mctalkcode_quantity_values}
+    \begin{tabular}{lp{4.0in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{COLLSION\_KEFF}                & estimated collision $k_{\mathrm{eff}}$ for this cycle \\
+        \texttt{ABSORPTION\_KEFF}              & estimated absorption $k_{\mathrm{eff}}$ for this cycle \\
+        \texttt{TRACKLENGTH\_KEFF}             & estimated track-length $k_{\mathrm{eff}}$ for this cycle \\
+        \texttt{COLLISION\_PRLT}               & estimated collision prompt-removal lifetime for this cycle \\
+        \texttt{ABSORPTION\_PRLT}              & estimated absorption prompt-removal lifetime for this cycle \\
+        \texttt{AVG\_COLLSION\_KEFF}           & average collision $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_COLLSION\_KEFF\_STD}      & standard deviation in the collision $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_ABSORPTION\_KEFF}         & average absorption $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_ABSORPTION\_KEFF\_STD}    & standard deviation in the absorption $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_TRACKLENGTH\_KEFF}        & average track-length $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_TRACKLENGTH\_KEFF\_STD}   & standard deviation in the track-length $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_COMBINED\_KEFF}           & average combined $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_COMBINED\_KEFF\_STD}      & standard deviation in the combined $k_{\mathrm{eff}}$ to this cycle \\
+        \texttt{AVG\_COMBINED\_KEFF\_BCS}      & average combined $k_{\mathrm{eff}}$ by cycles skipped \\
+        \texttt{AVG\_COMBINED\_KEFF\_BCS\_STD} & standard deviation in the combined $k_{\mathrm{eff}}$ by cycles skipped \\
+        \texttt{COMBINED\_PRLT}                & average combined prompt-removal lifetime \\
+        \texttt{COMBINED\_PRLT\_STD}           & standard deviation in the combined prompt-removal lifetime \\
+        \texttt{CYCLE\_NPS}                    & number of histories used in each cycle \\
+        \texttt{AVG\_COMBINED\_FOM}            & combined figure of merit \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+The Python code in Listing~\ref{lst:mctalkcode_class_use_example} illustrates
+how to get the combined (collision/absorption/track-length) value of
+$k_{\mathrm{eff}}$ and its standard deviation (for brevity it is assumed the
+MCTAL file has been opened in object \texttt{mctal}).
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{MctalKcode} Class Use Example},
+  label={lst:mctalkcode_class_use_example},
+  float
+]
+# get the kcode data from the mctal file
+kcode = mctal.GetKcode()
+
+# get the average combined keff from the last cycle
+keff = kcode.GetValue(MctalKcode.AVG_COMBINED_KEFF)
+
+# get the standard deviation in combined keff
+keff = kcode.GetValue(MctalKcode.AVG_COMBINED_KEFF_STD)
+\end{lstlisting}
+
+\subsection{Accessing MESHTAL Data with MCNPTools}\label{accessing-meshtal-data-with-mcnptools}
+
+MCNP column-formatted MESHTAL (type B, a.k.a, MCNP5 style mesh tallies from the
+\texttt{fmesh} card) data is accessed through the following classes:
+
+\begin{description}
+  \item[\texttt{Meshtal}] provides object-oriented access to the MESHTAL file
+  \item[\texttt{MeshtalTally}] provides object-oriented access to tally data
+\end{description}
+
+Each class will be discussed in the following sections.
+
+\subsubsection{\texttt{Meshtal} Class}\label{the-meshtal-class}
+
+To construct (create) an instance of the \texttt{Meshtal} class, one simply
+passes the name of a MESHTAL (type B) file to the \texttt{Meshtal} constructor,
+e.g.,
+
+\begin{lstlisting}[language=Python]
+Meshtal("mymeshtal")
+\end{lstlisting}
+
+The public methods available for the \texttt{Meshtal} class are given in
+Table~\ref{tab:meshtal_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{Meshtal} Class Public Methods}
+  \label{tab:meshtal_class_public_methods}
+    \begin{tabular}{lp{3.5in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{GetCode()}      & return a string of the generating code name \\
+        \texttt{GetVersion()}   & return a string the code version \\
+        \texttt{GetProbid()}    & return a string the problem id number \\
+        \texttt{GetComment()}   & return a string of the problem comment \\
+        \texttt{GetNps()}       & return the number of histories to which values are normalized \\
+        \texttt{GetTallyList()} & return a list/vector of tallies in the file \\
+        \texttt{GetTally(NUM)}  & return a \texttt{MeshtalTally} class instance for tally \texttt{NUM} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+The most commonly used methods of the \texttt{Meshtal} class are
+\texttt{GetTallyList()} and \texttt{GetTally}. The Python code in
+Listing~\ref{lst:meshtal_class_use_example} illustrates how to open a MESHTAL
+file with the \texttt{Meshtal} class, loop over the tallies, and obtain the
+tally data
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{Meshtal} Class Use Example},
+  label={lst:meshtal_class_use_example},
+  float
+]
+import mcnptools
+
+# load the meshtal file mymeshtal
+meshtal = mcnptools.Meshtal("mymeshtal")
+
+# loop over all the tallies in the file
+for tallynum in meshtal.GetTallyList():
+    # obtain the tally data
+    tally = meshtal.GetTally(tallynum)
+
+    # now do something with the tally
+\end{lstlisting}
+
+\subsubsection{\texttt{MeshtalTally} Class}\label{the-meshtaltally-class}
+
+The \texttt{MeshtalTally} provides accessors for a tally in a MESHTAL
+file. The public methods of the \texttt{MeshtalTally} class are given in
+Table~\ref{tab:meshtaltally_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{MeshtalTally} Class Public Methods}
+  \label{tab:meshtaltally_class_public_methods}
+    \begin{tabular}{lp{4.0in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{ID()}                & return a list/vector of the tally id (number) \\
+        \texttt{GetXRBounds()}       & return a list/vector of the $x$/$r$ bin boundaries \\
+        \texttt{GetYZBounds()}       & return a list/vector of the $y$/$z$ bin boundaries \\
+        \texttt{GetZTBounds()}       & return a list/vector of the $z$/$\theta$ bin boundaries \\
+        \texttt{GetEBounds()}        & return a list/vector of the energy bin boundaries \\
+        \texttt{GetTBounds()}        & return a list/vector of the time bin boundaries \\
+        \texttt{GetXRBins()}         & return a list/vector of the $x$/$r$ bin centers \\
+        \texttt{GetYZBins()}         & return a list/vector of the $y$/$z$ bin centers \\
+        \texttt{GetZTBins()}         & return a list/vector of the $z$/$\theta$ bin centers \\
+        \texttt{GetEBins()}          & return a list/vector of the energy bins \\
+        \texttt{GetTBins()}          & return a list/vector of the time bins \\
+        \texttt{GetVolume(I,J,K)}    & return the volume of element at index \texttt{(I,J,K)} \\
+        \texttt{GetValue(I,J,K,E,T)} & return the value at index \texttt{(I,J,K)} and optionally energy index \texttt{E} and time index \texttt{T} \\
+        \texttt{GetError(I,J,K,E,T)} & return the \emph{relative} error at index \texttt{(I,J,K)} and optionally energy index \texttt{E} and time index \texttt{T} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+If the energy-bin index is omitted from the \texttt{GetValue} or
+\texttt{GetError} method calls, then the total bin will be used if present.
+Otherwise, the largest energy bin will be used. Similarly, if the time-bin index
+is omitted from the \texttt{GetValue} and \texttt{GetError} method calls then
+the total bin will be used if present. Otherwise the last time bin will be used.
+
+The Python code in Listing~\ref{lst:meshtaltally_class_use_example} illustrates
+how to loop through spatial elements of a \texttt{MeshtalTally} and query the
+values and errors at each element. For brevity it is assumed the MESHTAL file
+has already been loaded into \texttt{meshtal}.
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{MeshtalTally} Class Use Example},
+  label={lst:meshtaltally_class_use_example},
+  float
+]
+# get the tally to process (e.g., tally 324)
+tally = meshtal.GetTally(324)
+
+xrbins = tally.GetXRBins()
+yzbins = tally.GetYZBins()
+ztbins = tally.GetZTBins()
+
+# loop over xrbins
+for i in range(len(xrbins)):
+    # loop over yzbins
+    for j in range(len(yzbins)):
+        # loop over ztbins
+        for k in range(len(ztbins)):
+            # print the value and error
+            print(i,j,k,meshtal.GetValue(i,j,k),meshtal.GetError(i,j,k))
+\end{lstlisting}
+
+\subsection{Accessing PTRAC Data with MCNPTools}\label{accessing-ptrac-data-with-mcnptools}
+
+MCNP particle track (PTRAC) data are organized such that the PTRAC file contains
+histories and each history contains events---i.e., things that actually happened
+to particles. PTRAC data can be read and processed with MCNPTools by use of the
+following classes:
+
+\begin{description}
+  \item[\texttt{Ptrac}] provides object-oriented access to PTRAC files and accesses \texttt{PtracHistory} classes
+  \item[\texttt{PtracHistory}] provides object-oriented access to histories within the PTRAC file and accesses \texttt{PtracEvents}
+  \item[\texttt{PtracNPS}] provides object-oriented access to NPS information in a \texttt{PtracHistory}
+  \item[\texttt{PtracEvent}] provides object-oriented access to events and their data within a \texttt{PtracHistory}
+\end{description}
+
+The typical workflow when processing PTRAC files with MCNPTools is as follows:
+
+\begin{enumerate}
+  \item Open the PTRAC file with the \texttt{Ptrac} class
+  \item Obtain histories in \texttt{PtracHistory} objects from the \texttt{Ptrac} class
+  \item Iterate over the events in \texttt{PtracEvent} objects from the \texttt{PtracHistory} class
+\end{enumerate}
+
+Each of these classes is discussed in the sections that follow.
+
+\subsubsection{\texttt{Ptrac} Class}\label{the-ptrac-class}
+
+The \texttt{Ptrac} class opens and manages MCNP PTRAC files and supports legacy
+binary, ASCII, and HDF5-formatted\footnote{HDF5-formatted PTRAC files are
+anticipated to be available in the next public release of the MCNP code.} PTRAC
+files. To construct the PTRAC file class, simply pass the PTRAC file name to the
+\texttt{Ptrac} constructor with the file type. For example, in Python one would
+use
+\begin{lstlisting}
+Ptrac("myptrac", Ptrac.BIN_PTRAC)
+\end{lstlisting}
+to open a legacy binary PTRAC file,
+\begin{lstlisting}
+Ptrac("myptrac", Ptrac.ASC_PTRAC)
+\end{lstlisting}
+to open an ASCII PTRAC file, and
+\begin{lstlisting}
+Ptrac("myptrac", Ptrac.HDF5_PTRAC)
+\end{lstlisting}
+to open an HDF5-formatted PTRAC file.
+
+If the file type is omitted, legacy binary is assumed.
+
+The \texttt{Ptrac} class has only one method \texttt{ReadHistories(NUM)} which
+returns a list/vector of histories. If \texttt{NUM} is omitted, then all the
+histories in the PTRAC file are read---this can be quite time consuming and is
+generally not recommended. A typical to reading histories in Python is shown in
+Listing~\ref{lst:ptrac_use_example}.
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{Ptrac} Class Use Example},
+  label={lst:ptrac_use_example},
+  float
+]
+# open the ptrac file (assuming legacy binary)
+ptrac = mcnptools.Ptrac("myptrac")
+
+# read history data in batches of 10000 histories
+histories = ptrac.ReadHistories(10000)
+
+# while histories has something in it
+while histories:
+
+    # iterate over the histories
+    for h in histories:
+        # do something with the history data
+
+    # read in more histories, again a batch of 10000
+    histories = ptrac.ReadHistories(10000)
+\end{lstlisting}
+
+\subsubsection{\texttt{PtracHistory} Class}\label{the-ptrachistory-class}
+
+The \texttt{PtracHistory} class provides access to the events within the
+history. The public class methods are given in
+Table~\ref{tab:ptrachistory_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{PtracHistory} Class Public Methods}
+  \label{tab:ptrachistory_class_public_methods}
+    \begin{tabular}{lp{4.0in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{GetNPS()}       & returns a \texttt{PtracNPS} class with NPS information \\
+        \texttt{GetNumEvents()} & returns the number of events in the history \\
+        \texttt{GetEvent(I)}    & returns the \texttt{I}th event in the history \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+A typical use of the \texttt{PtracHistory} class to obtain its events using
+Python is shown in Listing~\ref{lst:ptrachistory_use_example}, where it is
+assumed that a \texttt{PtracHistory} exists in the variable \texttt{hist}):
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{PtracHistory} Class Use Example},
+  label={lst:ptrachistory_use_example},
+  float
+]
+for i in range(hist.GetNumEvents()):
+    event = hist.GetEvent(i)
+
+    # now do something with the event
+\end{lstlisting}
+
+\subsubsection{\texttt{PtracNPS} Class}\label{the-ptracnps-class}
+
+The \texttt{PtracNPS} class contains information about the history. The
+public methods in the \texttt{PtracNPS} class are given in
+Table~\ref{tab:ptracnps_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{PtracNPS} Class Public Methods}
+  \label{tab:ptracnps_class_public_methods}
+    \begin{tabular}{lp{4.0in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{NPS()}     & return the history number \\
+        \texttt{Cell()}    & return the filtering cell from CELL keyword (if present) \\
+        \texttt{Surface()} & return the filtering surface from SURFACE keyword (if present) \\
+        \texttt{Tally()}   & return the filtering tally from TALLY keyword (if present) \\
+        \texttt{Value()}   & return the tally score from TALLY keyword (if present)  \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+For an HDF5 PTRAC file, the filtering cell, surface, tally, and value are not
+recorded in the PTRAC file.  Please contact an MCNP developer at
+\href{mailto:mcnp\_help@lanl.gov}{mcnp\_help@lanl.gov} if this limitation
+proves prohibitive.
+
+\subsubsection{\texttt{PtracEvent} Class}\label{the-ptracevent-class}
+
+The \texttt{PtracEvent} class contains information about the event.
+Different event types contain different information about the event. The
+\texttt{PtracEvent} public class methods are given in
+Table~\ref{tab:ptracevent_class_public_methods}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{PtracEvent} Class Public Methods}
+  \label{tab:ptracevent_class_public_methods}
+    \begin{tabular}{lp{4.0in}}
+      \toprule
+        Method & Description \\
+      \midrule
+        \texttt{Type()}     & returns the event type: one of \texttt{Ptrac::SRC} (source), \texttt{Ptrac::BNK} (bank), \texttt{Ptrac::COL} (collision), \texttt{Ptrac::SUR} (surface crossing), or \texttt{Ptrac::TER} (termination) \\
+        \texttt{BankType()} & returns the bank event type (only for \texttt{Ptrac::BNK} events) \\
+        \texttt{Has(DATA)}  & returns a Boolean indicating whether or not the data type DATA is contained within the event \\
+        \texttt{Get(DATA)}  & returns the value of the requested data type DATA  \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+The DATA types available for the \texttt{Has} and \texttt{Get} methods are part
+of the \texttt{Ptrac} name space and are given in
+Table~\ref{tab:ptracevent_data_types}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{PtracEvent} Data Types}
+  \label{tab:ptracevent_data_types}
+    \begin{tabular}{lp{4.0in}}
+      \toprule
+        Data Type & Description \\
+      \midrule
+        \texttt{NODE}              & node number \\
+        \texttt{ZAID}              & ZAID the particle interacts with \\
+        \texttt{RXN}               & reaction type (MT number) \\
+        \texttt{SURFACE}           & surface number \\
+        \texttt{ANGLE}             & angle of particle crossing the surface \\
+        \texttt{TERMINATION\_TYPE} & termination type \\
+        \texttt{PARTICLE}          & particle type \\
+        \texttt{CELL}              & cell number \\
+        \texttt{MATERIAL}          & material number \\
+        \texttt{COLLISION\_NUMBER} & collision number \\
+        \texttt{X}                 & particle $x$ coordinate \\
+        \texttt{Y}                 & particle $y$ coordinate \\
+        \texttt{Z}                 & particle $z$ coordinate \\
+        \texttt{U}                 & particle direction cosine with respect to the $x$ axis \\
+        \texttt{V}                 & particle direction cosine with respect to the $y$ axis \\
+        \texttt{W}                 & particle direction cosine with respect to the $z$ axis \\
+        \texttt{ENERGY}            & particle energy \\
+        \texttt{WEIGHT}            & particle weight \\
+        \texttt{TIME}              & particle time  \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+The Python code given in Listing~\ref{lst:ptracevent_use_example} demonstrates
+how to find all collision events in a history and print the energy (for brevity
+a \texttt{PtracHistory} instance is assumed to be in the \texttt{hist}
+variable).
+
+\begin{lstlisting}[
+  language=Python,
+  caption={\texttt{PtracEvent} Class Use Example},
+  label={lst:ptracevent_use_example},
+  float
+]
+#iterate over all events in the history
+for i in range(hist.GetNumEvents()):
+    event = hist.GetEvent()
+
+    # check if the event is a collision event
+    if( event.Type() == Ptrac.COL ):
+        # print the energy
+        print(event.Get(Ptrac.ENERGY))
+\end{lstlisting}
+
+The PTRAC bank type variable specifiers that are part of the \texttt{Ptrac} name
+space are listed in Table~\ref{tab:ptracevent_data_types}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{PtracEvent} Data Types}
+  \label{tab:ptracevent_data_types}
+    \begin{tabular}{lp{4.75in}}
+      \toprule
+        Data Type & Description \\
+      \midrule
+        \texttt{BNK\_DXT\_TRACK}       & DXTRAN particle \\
+        \texttt{BNK\_ERG\_TME\_SPLIT}  & Energy or Time splitting \\
+        \texttt{BNK\_WWS\_SPLIT}       & Weight-window surface crossing \\
+        \texttt{BNK\_WWC\_SPLIT}       & Weight-window collision \\
+        \texttt{BNK\_UNC\_TRACK}       & Forced-collision uncollided part \\
+        \texttt{BNK\_IMP\_SPLIT}       & Importance splitting \\
+        \texttt{BNK\_N\_XN\_F}         & Neutrons from fission \\
+        \texttt{BNK\_N\_XG}            & Gammas from neutron production \\
+        \texttt{BNK\_FLUORESCENCE}     & Fluorescence x-rays \\
+        \texttt{BNK\_ANNIHILATION}     & Annihilation photons \\
+        \texttt{BNK\_PHOTO\_ELECTRON}  & Photo electrons \\
+        \texttt{BNK\_COMPT\_ELECTRON}  & Compton electrons \\
+        \texttt{BNK\_PAIR\_ELECTRON}   & Pair-production electron \\
+        \texttt{BNK\_AUGER\_ELECTRON}  & Auger electrons \\
+        \texttt{BNK\_PAIR\_POSITRON}   & Pair-production positron \\
+        \texttt{BNK\_BREMSSTRAHLUNG}   & Bremsstrahlung production \\
+        \texttt{BNK\_KNOCK\_ON}        & Knock-on electron \\
+        \texttt{BNK\_K\_X\_RAY}        & K-shell x-ray production \\
+        \texttt{BNK\_N\_XG\_MG}        & Multigroup (n,x$\gamma$) \\
+        \texttt{BNK\_N\_XF\_MG}        & Multigroup (n,f) \\
+        \texttt{BNK\_N\_XN\_MG}        & Multigroup (n,xn) \\
+        \texttt{BNK\_G\_XG\_MG}        & Multigroup ($\gamma$,x$\gamma$) \\
+        \texttt{BNK\_ADJ\_SPLIT}       & Multigroup adjoint splitting \\
+        \texttt{BNK\_WWT\_SPLIT}       & Weight-window mean-free-path split \\
+        \texttt{BNK\_PHOTONUCLEAR}     & Photo-nuclear production \\
+        \texttt{BNK\_DECAY}            & Radioactive decay \\
+        \texttt{BNK\_NUCLEAR\_INT}     & Nuclear interaction \\
+        \texttt{BNK\_RECOIL}           & Recoil nucleus \\
+        \texttt{BNK\_DXTRAN\_ANNIHIL}  & DXTRAN annihilation photon from pulse-height tally variance reduction \\
+        \texttt{BNK\_N\_CHARGED\_PART} & Light ions from neutrons \\
+        \texttt{BNK\_H\_CHARGED\_PART} & Light ions from protons \\
+        \texttt{BNK\_N\_TO\_TABULAR}   & Library neutrons from model neutrons \\
+        \texttt{BNK\_MODEL\_UPDAT1}    & Secondary particles from inelastic nuclear interactions \\
+        \texttt{BNK\_MODEL\_UPDATE}    & Secondary particles from elastic nuclear interactions \\
+        \texttt{BNK\_DELAYED\_NEUTRON} & Delayed neutron from radioactive decay \\
+        \texttt{BNK\_DELAYED\_PHOTON}  & Delayed photon from radioactive decay \\
+        \texttt{BNK\_DELAYED\_BETA}    & Delayed $\beta^-$ from radioactive decay \\
+        \texttt{BNK\_DELAYED\_ALPHA}   & Delayed $\alpha$ from radioactive decay \\
+        \texttt{BNK\_DELAYED\_POSITRN} & Delayed $\beta^+$ from radioactive decay \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+The PTRAC termination types that are members of the \texttt{Ptrac} name space
+are listed in Table~\ref{tab:ptracevent_termination_types}.
+
+\begin{table}[]
+  \begin{center}
+  \caption{\texttt{PtracEvent} Termination Types}
+  \label{tab:ptracevent_termination_types}
+    \begin{tabular}{lp{3.5in}}
+      \toprule
+        Termination Type & Description \\
+      \midrule
+        \texttt{TER\_ESCAPE}                        & Escape \\
+        \texttt{TER\_ENERGY\_CUTOFF}                & Energy cutoff \\
+        \texttt{TER\_TIME\_CUTOFF}                  & Time cutoff \\
+        \texttt{TER\_WEIGHT\_WINDOW}                & Weight-window roulette \\
+        \texttt{TER\_CELL\_IMPORTANCE}              & Cell importance roulette \\
+        \texttt{TER\_WEIGHT\_CUTOFF}                & Weight-cutoff roulette \\
+        \texttt{TER\_ENERGY\_IMPORTANCE}            & Energy-importance roulette \\
+        \texttt{TER\_DXTRAN}                        & DXTRAN roulette \\
+        \texttt{TER\_FORCED\_COLLISION}             & Forced-collision \\
+        \texttt{TER\_EXPONENTIAL\_TRANSFORM}        & Exponential-transform \\
+        \texttt{TER\_N\_DOWNSCATTERING}             & Neutron downscattering \\
+        \texttt{TER\_N\_CAPTURE}                    & Neutron capture \\
+        \texttt{TER\_N\_N\_XN}                      & Loss to (n,xn) \\
+        \texttt{TER\_N\_FISSION}                    & Loss to fission \\
+        \texttt{TER\_N\_NUCLEAR\_INTERACTION}       & Nuclear interactions \\
+        \texttt{TER\_N\_PARTICLE\_DECAY}            & Particle decay \\
+        \texttt{TER\_N\_TABULAR\_BOUNDARY}          & Tabular boundary \\
+        \texttt{TER\_P\_COMPTON\_SCATTER}           & Photon Compton scattering \\
+        \texttt{TER\_P\_CAPTURE}                    & Photon capture \\
+        \texttt{TER\_P\_PAIR\_PRODUCTION}           & Photon pair production \\
+        \texttt{TER\_P\_PHOTONUCLEAR}               & Photonuclear reaction \\
+        \texttt{TER\_E\_SCATTER}                    & Electron scatter \\
+        \texttt{TER\_E\_BREMSSTRAHLUNG}             & Bremsstrahlung \\
+        \texttt{TER\_E\_INTERACTION\_DECAY}         & Interaction or decay \\
+        \texttt{TER\_GENNEUT\_NUCLEAR\_INTERACTION} & Generic neutral-particle nuclear interactions \\
+        \texttt{TER\_GENNEUT\_ELASTIC\_SCATTER}     & Generic neutral-particle elastic scatter \\
+        \texttt{TER\_GENNEUT\_DECAY}                & Generic neutral-particle particle decay \\
+        \texttt{TER\_GENCHAR\_MULTIPLE\_SCATTER}    & Generic charged-particle multiple scatter \\
+        \texttt{TER\_GENCHAR\_BREMSSTRAHLUNG}       & Generic charged-particle bremsstrahlung \\
+        \texttt{TER\_GENCHAR\_NUCLEAR\_INTERACTION} & Generic charged-particle nuclear interactions \\
+        \texttt{TER\_GENCHAR\_ELASTIC\_SCATTER}     & Generic charged-particle elastic scatter \\
+        \texttt{TER\_GENCHAR\_DECAY}                & Generic charged-particle particle decay \\
+        \texttt{TER\_GENCHAR\_CAPTURE}              & Generic charged-particle capture \\
+        \texttt{TER\_GENCHAR\_TABULAR\_SAMPLING}    & Generic charged-particle tabular sampling \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\clearpage
+\section{Acknowledgments}\label{acknowledgments}
+
+The authors acknowledge Mike Rising, David Dixon, and Jeff Bull for their review
+of MCNPTools documentation and for testing it.
+The authors also appreciate user feedback such as the patch proposed by Matthew
+T.~Montgomery to fix a \texttt{mctal}-file parsing error.
+Finally, the authors are grateful to the support provided
+by the Advanced Simulation and Computing (ASC) Program to develop, maintain, and
+release MCNPTools.
+
+\newpage \appendix
+
+\section{Help Messages for MCNPTools Utilities}\label{Help Messages for MCNPTools Utilities}
+
+\lstinputlisting[
+  caption={\texttt{l3d2vtk} Help Message Output},
+  label={lst:l3d2vtk-help-message-output},
+]{include/help_messages/help_l3d2vtk.txt}
+
+\clearpage
+\lstinputlisting[
+  caption={\texttt{l3dcoarsen} Help Message Output},
+  label={lst:l3dcoarsen-help-message-output},
+]{include/help_messages/help_l3dcoarsen.txt}
+
+\clearpage
+\lstinputlisting[
+  caption={\texttt{l3dinfo} Help Message Output},
+  label={lst:l3dinfo-help-message-output},
+]{include/help_messages/help_l3dinfo.txt}
+
+\clearpage
+\lstinputlisting[
+  caption={\texttt{l3dscale} Help Message Output},
+  label={lst:l3dscale-help-message-output},
+]{include/help_messages/help_l3dscale.txt}
+
+\clearpage
+\lstinputlisting[
+  caption={\texttt{mctal2rad} Help Message Output},
+  label={lst:mctal2rad-help-message-output},
+]{include/help_messages/help_mctal2rad.txt}
+
+\clearpage
+\lstinputlisting[
+  caption={\texttt{mergemctals} Help Message Output},
+  label={lst:mergemctals-help-message-output},
+]{include/help_messages/help_mergemctals.txt}
+
+\clearpage
+\lstinputlisting[
+  caption={\texttt{mergemeshtals} Help Message Output},
+  label={lst:mergemeshtals-help-message-output},
+]{include/help_messages/help_mergemeshtals.txt}
+
+\clearpage
+\lstinputlisting[
+  caption={\texttt{meshtal2vtk} Help Message Output},
+  label={lst:meshtal2vtk-help-message-output},
+]{include/help_messages/help_meshtal2vtk.txt}
+
+\clearpage
+\section{C++ Examples}\label{c-examples}
+
+\subsection{Mctal Example 1}\label{mctal-example-1}
+
+Listing~\ref{lst:C++ Mctal Example 1} opens the MCTAL file
+\texttt{example\_mctal\_1.mcnp.mctal} and extracts the energy bins and
+energy-bin tally values for tally 4.
+
+\lstinputlisting[
+  caption={C++ Mctal Example 1},
+  label={lst:C++ Mctal Example 1},
+  language=C++
+]{include/installation_and_use_examples/cpp_example_mctal_1.cpp}
+\embedfile[ucfilespec={cpp\_example\_mctal\_1.cpp.txt}]{include/installation_and_use_examples/cpp_example_mctal_1.cpp}
+
+\clearpage
+\subsection{Mctal Example 1 with GetValues}\label{mctal-example-1-getvalues}
+
+Listing~\ref{lst:C++ Mctal Example 1 GetValues} opens the MCTAL file
+\texttt{example\_mctal\_1.mcnp.mctal} and extracts the
+energy-bin tally values for tally 4 using the GetValues method.
+
+\lstinputlisting[
+  caption={C++ Mctal Example 1 GetValues},
+  label={lst:C++ Mctal Example 1 GetValues},
+  language=C++
+]{include/installation_and_use_examples/cpp_example_mctal_1_getvalues.cpp}
+\embedfile[ucfilespec={cpp\_example\_mctal\_1\_getvalues.cpp.txt}]{include/installation_and_use_examples/cpp_example_mctal_1_getvalues.cpp}
+
+\clearpage
+\subsection{Mctal Example 2}\label{mctal-example-2}
+
+Listing~\ref{lst:C++ Mctal Example 2} opens the MCTAL file
+\texttt{example\_mctal\_2.mcnp.mctal} and extracts the $k_{\mathrm{eff}}$ value
+and standard deviation for the active cycles, i.e., from the last settle cycle
+through the last active cycle.
+
+\lstinputlisting[
+  caption={C++ Mctal Example 2},
+  label={lst:C++ Mctal Example 2},
+  language=C++
+]{include/installation_and_use_examples/cpp_example_mctal_2.cpp}
+\embedfile[ucfilespec={cpp\_example\_mctal\_2.cpp.txt}]{include/installation_and_use_examples/cpp_example_mctal_2.cpp}
+
+\clearpage
+\subsection{Meshtal Example}\label{meshtal-example}
+
+Listing~\ref{lst:C++ Meshtal Example} reads tally 4 from MESHTAL file
+\texttt{example\_meshtal.mcnp.meshtal} and prints the values at a slice through
+the $z$ index 5 (using 0 indexing).
+
+\lstinputlisting[
+  caption={C++ Meshtal Example},
+  label={lst:C++ Meshtal Example},
+  language=C++
+]{include/installation_and_use_examples/cpp_example_meshtal.cpp}
+\embedfile[ucfilespec={cpp\_example\_meshtal.cpp.txt}]{include/installation_and_use_examples/cpp_example_meshtal.cpp}
+
+\clearpage
+\subsection{Ptrac Example 1}\label{ptrac-example-1}
+
+Listing~\ref{lst:C++ Ptrac Example 1} opens the binary PTRAC file
+\texttt{example\_ptrac\_1.mcnp.ptrac} and prints the $\left(x,y,z\right)$
+location and energy of bank events.
+
+\lstinputlisting[
+  caption={C++ Ptrac Example 1},
+  label={lst:C++ Ptrac Example 1},
+  language=C++
+]{include/installation_and_use_examples/cpp_example_ptrac_1.cpp}
+\embedfile[ucfilespec={cpp\_example\_ptrac\_1.cpp.txt}]{include/installation_and_use_examples/cpp_example_ptrac_1.cpp}
+
+\clearpage
+\subsection{Ptrac Example 2}\label{ptrac-example-2}
+
+Listing~\ref{lst:C++ Ptrac Example 2} opens binary PTRAC file
+\texttt{example\_ptrac\_2.mcnp.ptrac} and prints the $\left(x,y,z\right)$
+location and angle of surface crossings.
+
+\lstinputlisting[
+  caption={C++ Ptrac Example 2},
+  label={lst:C++ Ptrac Example 2},
+  language=C++
+]{include/installation_and_use_examples/cpp_example_ptrac_2.cpp}
+\embedfile[ucfilespec={cpp\_example\_ptrac\_2.cpp.txt}]{include/installation_and_use_examples/cpp_example_ptrac_2.cpp}
+
+\clearpage
+\section{Python Examples}\label{python-examples}
+
+\subsection{Mctal Example 1}\label{mctal-example-1-1}
+
+Listing~\ref{lst:Python Mctal Example 1} opens the MCTAL file
+\texttt{example\_mctal\_1.mcnp.mctal} and extracts the energy bins and
+energy-bin tally values for tally 4.
+
+\lstinputlisting[
+  caption={Python Mctal Example 1},
+  label={lst:Python Mctal Example 1},
+  language=Python
+]{include/installation_and_use_examples/python_example_mctal_1.py}
+\embedfile[ucfilespec={python\_example\_mctal\_1.py.txt}]{include/installation_and_use_examples/python_example_mctal_1.py}
+
+\clearpage
+\subsection{Mctal Example 2}\label{mctal-example-2-1}
+
+Listing~\ref{lst:Python Mctal Example 2} opens the MCTAL file
+\texttt{example\_mctal\_2.mcnp.mctal} and extracts the $k_{\mathrm{eff}}$ value
+and standard deviation for the active cycles, i.e., from the last settle cycle
+through the last active cycle.
+
+\lstinputlisting[
+  caption={Python Mctal Example 2},
+  label={lst:Python Mctal Example 2},
+  language=Python
+]{include/installation_and_use_examples/python_example_mctal_2.py}
+\embedfile[ucfilespec={python\_example\_mctal\_2.py.txt}]{include/installation_and_use_examples/python_example_mctal_2.py}
+
+\clearpage
+\subsection{Meshtal Example}\label{meshtal-example-1}
+
+Listing~\ref{lst:Python Meshtal Example} reads tally 4 from MESHTAL file
+\texttt{example\_meshtal.mcnp.meshtal} and prints the values at a slice through
+the $z$ index 5 (using 0 indexing).
+
+\lstinputlisting[
+  caption={Python Meshtal Example},
+  label={lst:Python Meshtal Example},
+  language=Python
+]{include/installation_and_use_examples/python_example_meshtal.py}
+\embedfile[ucfilespec={python\_example\_meshtal.py.txt}]{include/installation_and_use_examples/python_example_meshtal.py}
+
+\clearpage
+\subsection{Ptrac Example 1}\label{ptrac-example-1-1}
+
+Listing~\ref{lst:Python Ptrac Example 1} opens the legacy binary PTRAC file
+\texttt{example\_ptrac\_1.mcnp.ptrac} and prints the $\left(x,y,z\right)$
+location and energy of bank events.
+
+\lstinputlisting[
+  caption={Python Ptrac Example 1},
+  label={lst:Python Ptrac Example 1},
+  language=Python
+]{include/installation_and_use_examples/python_example_ptrac_1.py}
+\embedfile[ucfilespec={python\_example\_ptrac\_1.py.txt}]{include/installation_and_use_examples/python_example_ptrac_1.py}
+
+\clearpage
+\subsection{Ptrac Example 2}\label{ptrac-example-2-1}
+
+Listing~\ref{lst:Python Ptrac Example 2} opens legacy binary PTRAC file
+\texttt{example\_ptrac\_2.mcnp.ptrac} and prints the $\left(x,y,z\right)$
+location and angle of surface crossings.
+
+\lstinputlisting[
+  caption={Python Ptrac Example 2},
+  label={lst:Python Ptrac Example 2},
+  language=Python
+]{include/installation_and_use_examples/python_example_ptrac_2.py}
+\embedfile[ucfilespec={python\_example\_ptrac\_2.py.txt}]{include/installation_and_use_examples/python_example_ptrac_2.py}
+
+\clearpage
+\subsection{Ptrac Example 3}\label{ptrac-example-3-1}
+
+Listing~\ref{lst:Python Ptrac Example 3} opens HDF5 PTRAC file
+\texttt{example\_ptrac\_3.mcnp.ptrac.h5} and prints information about
+surface-crossing and termination events.
+
+\lstinputlisting[
+  caption={Python Ptrac Example 3},
+  label={lst:Python Ptrac Example 3},
+  language=Python
+]{include/installation_and_use_examples/python_example_ptrac_3.py}
+\embedfile[ucfilespec={python\_example\_ptrac\_3.py.txt}]{include/installation_and_use_examples/python_example_ptrac_3.py}
+
+\end{document}
+

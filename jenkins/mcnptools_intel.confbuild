@@ -1,0 +1,5 @@
+#!/bin/env bash
+mkdir -p build
+cd build
+CC=icc CXX=icpc cmake ../libmcnptools
+make -j 8

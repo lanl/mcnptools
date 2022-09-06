@@ -1,0 +1,20 @@
+add_library(catch2objects OBJECT f5.test.main.cpp)
+target_link_libraries(catch2objects PUBLIC shacl::F5_CXX::testing)
+
+function(setup_test name source)
+  add_executable(shacl.${name} ${source})
+  target_link_libraries(shacl.${name} PRIVATE catch2objects)
+  add_test(NAME shacl.${name} COMMAND $<TARGET_FILE:shacl.${name}>)
+endfunction()
+
+setup_test(F5.test f5.test.cpp)
+setup_test(F5.attribute.test f5.attribute.test.cpp)
+setup_test(F5.dataset.test f5.dataset.test.cpp)
+setup_test(F5.simpletype.test f5.simpletype.test.cpp)
+setup_test(F5.compoundtype.test f5.compoundtype.test.cpp)
+
+if(shacl.F5_CXX.MPI)
+  add_executable(shacl.f5.mpi.test f5.test.mpi.cpp)
+  target_link_libraries(shacl.f5.mpi.test PRIVATE catch2objects)
+  add_test(NAME shacl.f5.mpi.test COMMAND ${MPIEXEC} -np 4 $<TARGET_FILE:shacl.f5.mpi.test>)
+endif()

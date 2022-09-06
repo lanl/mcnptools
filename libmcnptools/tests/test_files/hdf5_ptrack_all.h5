@@ -1,0 +1,69 @@
+MCNP Fixed Source calculation
+c ========== Cell Cards ==========
+1024   1   -1.95869e+01 -130       imp:n=1
+1025   1   -1.95869e+01 +130   -131   imp:n=1
+1026   1   -1.95869e+01 +131   -132   imp:n=1
+1027   1   -1.95869e+01 +132   -133   imp:n=1
+1028   1   -1.95869e+01 +133   -134   imp:n=1
+1029   1   -1.95869e+01 +134   -135   imp:n=1
+1030   1   -1.95869e+01 +135   -136   imp:n=1
+1031   1   -1.95869e+01 +136   -137   imp:n=1
+1032   1   -1.95869e+01 +137   -138   imp:n=1
+1033   1   -1.95869e+01 +138   -139   imp:n=1
+1034   1   -1.95869e+01 +139   -140   imp:n=1
+1035   411 -8.00000e+00 +140   -141   imp:n=1
+9999    0  +141   imp:n=0 $Particle kill zone
+
+c ========== Surface Cards ==========
+130    so  2.000000e-01
+131    so  3.000000e-01
+132    so  5.000000e-01
+133    so  1.000000e+00
+134    so  1.100000e+00
+135    so  1.200000e+00
+136    so  1.300000e+00
+137    so  1.400000e+00
+138    so  1.500000e+00
+139    so  1.600000e+00
+140    so  3.793800e+00
+141    so  3.823800e+00
+
+c ========== Data Cards ==========
+c
+c - - - - Material Cards - - - -
+c --------------------------
+c Material: berp_alpu
+c --------------------------
+m1    94238       -1.99886e-04 $Isotope Pu-238
+      94239       -9.36814e-01 $Isotope Pu-239
+      94240       -5.94660e-02 $Isotope Pu-240
+      94241       -2.96330e-03 $Isotope Pu-241
+      95241       -5.56682e-04 $Isotope Am-241
+c --------------------------
+c Material: steel_stainless_304
+c --------------------------
+m411  6000        -3.99996e-04 $Isotope Avg.C
+      14000       -4.99995e-03 $Isotope Avg.Si
+      15031       -2.29998e-04 $Isotope P-31
+      16000       -1.49999e-04 $Isotope Avg.S
+      24000       -1.89998e-01 $Isotope Avg.Cr
+      25055       -9.99990e-03 $Isotope Mn-55
+      26000       -7.01723e-01 $Isotope Avg.Fe
+      28000       -9.24991e-02 $Isotope Avg.Ni
+c
+c - - - - Problem Specifications - - - -
+mode n
+totnu
+prdmp 4j 1000
+nps 10
+c
+c - - - - - Tally Specifications - - - - -
+fc1 Neutron leakage tally
+f1:n 141
+c
+c - - - - Source - - - - - - - -
+sdef   pos=0 0 0  
+       erg=14.1 wgt=2.80749e+05
+c start ptrac
+ptrac write=all max=1e9 file=hdf5
+c end ptrac

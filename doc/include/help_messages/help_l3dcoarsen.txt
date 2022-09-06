@@ -1,0 +1,31 @@
+USAGE: l3dcoarsen [--version] [--novoid] [--ifact ifact] [--jfact jfact] 
+       [--kfact kfact] [--maxmats maxmats] <LNK3DNT> [OUTPUT] 
+
+DESCRIPTION:
+
+l3dcoarsen coarsens a LNK3DNT file mesh by specified factors 
+
+OPTIONS:
+
+--version, -v     : Print version and exit 
+
+--novoid, -n      : Make voids material '0' rather than the assumed material 
+                    '1' (not recommended) 
+
+--ifact, -i       : Factor by which to coarsen in the first mesh dimension 
+
+--jfact, -j       : Factor by which to coarsen in the second mesh dimension 
+                    (if applicable) 
+
+--kfact, -k       : Factor by which to coarsen in the third mesh dimension (if 
+                    applicable) 
+
+--maxmats, -m     : Maximum umber of materials to keep include on the 
+                    coarsened LNK3DNT file (default: same as original) 
+
+LNK3DNT           : LNK3DNT file name to coarsen 
+
+OUTPUT            : coarsened LNK3DNT output name (Default: lnk3dnt.coarse) 
+
+AUTHOR: Clell J. (CJ) Solomon [csolomon@lanl.gov] 
+

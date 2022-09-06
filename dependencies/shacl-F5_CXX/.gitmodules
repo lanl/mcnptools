@@ -1,0 +1,3 @@
+[submodule "dependencies/catch2"]
+	path = dependencies/Catch2
+	url = ../../catchorg/catch2.git

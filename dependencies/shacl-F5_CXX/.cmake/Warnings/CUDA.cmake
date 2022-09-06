@@ -1,0 +1,6 @@
+if(DEFINED CMAKE_CUDA_COMPILER)
+  if(NOT TARGET shacl::cmake::Warnings_CUDA)
+    add_library(shacl::cmake::Warnings_CUDA INTERFACE IMPORTED GLOBAL)
+    include(Warnings/CUDA/NVIDIA)
+  endif()
+endif()

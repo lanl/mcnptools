@@ -1,0 +1,20 @@
+target_sources(mcnptools_boost PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/c_regex_traits.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp_regex_traits.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/cregex.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/fileiter.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/icu.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/instances.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/internals.hpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/posix_api.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/regex.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/regex_debug.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/regex_raw_buffer.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/regex_traits_defaults.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/static_mutex.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/usinstances.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/w32_regex_traits.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/wc_regex_traits.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/wide_posix_api.cpp;
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/winstances.cpp>
+)

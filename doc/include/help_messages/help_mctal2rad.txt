@@ -1,0 +1,23 @@
+USAGE: mctal2rad [--version] [--log] [--direct] [--transpose] <MCTAL> 
+       [TALLY [TALLY ... ]] 
+
+DESCRIPTION:
+
+mctal2rad converts an image tally from an MCNP MCTAL file into a TIFF image 
+
+OPTIONS:
+
+--version, -v     : Print version and exit 
+
+--log, -l         : Produce an image of the log of the MCTAL values 
+
+--direct, -d      : Produce an image of the direct contribution 
+
+--transpose, -t   : Transpose the image 
+
+MCTAL             : MCTAL file containing one or more image tallies 
+
+TALLY             : Tally number for which to produce the images 
+
+AUTHOR: Clell J. (CJ) Solomon [csolomon@lanl.gov] 
+
