@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 cmake_policy(SET CMP0076 OLD)
-project(mcnptools VERSION 5.3.0 LANGUAGES C CXX)
+project(mcnptools VERSION 5.3.1 LANGUAGES C CXX)
 
 include(CTest)
 include(CMakeDependentOption)
