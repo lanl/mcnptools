@@ -13,9 +13,12 @@ Alamos National Laboratory report LA-UR-22-28935 (see also How to Cite below).
 
 # Building, Testing, and Installing Quick Start
 
-Assuming that CMake and a C++11 compiler and Python interpreter are
-available on the command-line, on most command-line systems one can execute the
-following commands from the same directory as this README file:
+The build process requires CMake, a C++11 compiler, and Python available in the
+path.
+
+To build, create a new build directory, open a command-line interface in that
+directory, and run the following commands (where [path to MCNPTools source
+directory] is the directory that contains this README file):
 
 ```
 cmake -D CMAKE_INSTALL_PREFIX=[path to install] -D mcnptools.python_install=User [path to MCNPTools source directory]
@@ -118,7 +121,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MCNP® and Monte Carlo N-Particle® are registered trademarks owned by Los Alamos
 National Security, LLC, manager and operator of Los Alamos National Laboratory.
 Any third party use of such registered marks should be properly attributed to
-Los Alamos National Security, LLC, including the use of the ® designation as
+Triad National Security, LLC, including the use of the ® designation as
 appropriate. Any questions regarding licensing, proper use, and/or proper
-attribution of Los Alamos National Security, LLC marks should be directed to
+attribution of Triad National Security, LLC marks should be directed to
 [trademarks@lanl.gov](mailto:trademarks@lanl.gov).
